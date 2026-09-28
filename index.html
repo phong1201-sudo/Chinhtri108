@@ -11,25 +11,28 @@
 :root{--bg:#14110c;--surface:#211d16;--surface2:#2a251d;--ink:#f2ede2;--muted:#a89e8c;--line:#3a3327;--accent:#f2647c;--accent2:#b0122b;--ok:#34d17f;--ok-bg:#12301f;--ok-line:#2a6a44;--warn:#e8a54a;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;line-height:1.45}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
 #app{display:flex;flex-direction:column;min-height:100%}
 .top{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;align-items:center;gap:9px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}
 .dot{width:11px;height:11px;border-radius:3px;background:var(--accent);box-shadow:0 0 0 3px rgba(242,100,124,.2)}
 .top b{font-size:16px;font-weight:800}.top .st{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
 .body{flex:1;display:flex;flex-direction:column;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));gap:16px}
 .shot{width:100%;border-radius:14px;border:1px solid var(--line);display:none}
-.big{font-size:34px;font-weight:800;letter-spacing:.5px;text-align:center;line-height:1.5;word-break:break-word}
-.big .n{color:var(--muted);font-size:24px;font-weight:700}.big .a{color:var(--ok)}.big .sep{color:var(--line)}
-.sub{text-align:center;font-size:13px;color:var(--muted)}
 .snap{border:none;background:var(--accent2);color:#fff;border-radius:16px;padding:20px;font:inherit;font-size:19px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(176,18,43,.4)}
-.snap:active{transform:scale(.98)}
-.snap .cam{font-size:26px}
+.snap:active{transform:scale(.98)}.snap .cam{font-size:26px}
 .row2{display:flex;gap:10px}
 .btn{flex:1;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:14px;padding:14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn:active{transform:scale(.98)}
+.pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:4px 0}
+.pill{display:flex;align-items:stretch;border-radius:12px;overflow:hidden;border:1.5px solid var(--ok-line);box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.pill .pn{background:var(--surface2);color:var(--muted);font-weight:800;font-size:18px;padding:8px 11px;display:flex;align-items:center}
+.pill .pa{background:var(--ok-bg);color:var(--ok);font-weight:800;font-size:26px;padding:6px 14px;display:flex;align-items:center;min-width:44px;justify-content:center}
+.pill.low{border-color:var(--warn)}.pill.low .pa{color:var(--warn);background:#2e2410}
+.sub{text-align:center;font-size:13px;color:var(--muted)}
 .row{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start}
 .row.low{border-color:var(--warn)}
 .rb{flex:none;width:42px;height:42px;border-radius:10px;background:var(--ok-bg);color:var(--ok);border:1.5px solid var(--ok-line);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800}
+.rb.low{color:var(--warn);border-color:var(--warn);background:#2e2410}
 .rmeta{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);margin-bottom:2px}
 .rq{font-size:13px;color:var(--muted)}.rq b{color:var(--ink);font-weight:700}
 .flag{font-size:11px;color:var(--warn);font-weight:700;margin-top:3px}
@@ -38,8 +41,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro"
 .bar{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .spin{width:40px;height:40px;border:4px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;margin:8px auto}
 @keyframes sp{to{transform:rotate(360deg)}}
-.hero{text-align:center;color:var(--muted);font-size:14px;padding:10px 6px}
-.hero .em{font-size:40px}
+.hero{text-align:center;color:var(--muted);font-size:14px;padding:10px 6px}.hero .em{font-size:40px}
 </style></head>
 <body><div id="app">
   <div class="top"><span class="dot"></span><b>Chụp là ra đáp án</b><span class="st" id="st">220 câu</span></div>
@@ -49,10 +51,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro"
     <img class="shot" id="shot" alt="">
     <div class="bar" id="barwrap" hidden><i id="bar"></i></div>
     <div class="status" id="status"></div>
-    <div class="big" id="big"></div>
+    <div class="pills" id="pills"></div>
     <div class="sub" id="sub"></div>
     <div class="detail" id="detail"></div>
-    <div class="hero" id="hero"><div class="em">📸</div>Bấm <b>Chụp ảnh câu hỏi</b>, camera mở ra — chụp rõ vùng câu hỏi. Ra đáp án xong bấm chụp tiếp câu khác.</div>
+    <div class="hero" id="hero"><div class="em">📸</div>Bấm <b>Chụp ảnh câu hỏi</b>, camera mở ra — chụp rõ vùng câu hỏi (chụp được nhiều câu một lần). Ra đáp án xong bấm chụp tiếp.</div>
     <input type="file" id="file" accept="image/*" capture="environment" hidden>
   </div>
 </div>
@@ -61,21 +63,23 @@ const BANK=[{"n":1,"q":"Theo Chủ tịch Hồ Chí Minh, về tình thương y�
 const $=s=>document.querySelector(s);
 const nrm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^a-zA-Z0-9\s]/g,' ').toLowerCase().replace(/\s+/g,' ').trim();
 const w=t=>IDF[t]||3.5;const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function stemOnly(t){const m=t.match(/[\s\n][ABCD]\s*[.)]\s/);return m?t.slice(0,m.index):t;}
 function match(bn){const toks=[...new Set(bn.split(' ').filter(t=>t.length>=2))];let best=null,bs=-1,second=-1;
  for(const q of BANK){let s=0,mW=0,tW=0;for(const t of toks){const iw=w(t);tW+=iw;if(q.qn.includes(t))mW+=iw;}if(tW>0)s=(mW/tW)*100+mW*1.2;if(q.qn.includes(bn)&&bn.length>15)s+=60;if(s>bs){second=bs;bs=s;best=q;}else if(s>second)second=s;}
  const conf=bs<=0?0:Math.min(1,(bs/(toks.length*4+40))*(second>0?Math.min(1.4,bs/(second+1)):1.2));return{q:best,conf};}
-function segment(text){const lines=text.split(/\n/);const blocks=[];let cur=null;const re=/^\s*(?:c[aâ]u\s*(?:h[oỏ]i)?\s*)?(\d{1,3})\s*[:.)]/i;
- for(const ln of lines){const m=ln.match(re);if(m){if(cur)blocks.push(cur);cur={num:parseInt(m[1],10),text:ln.replace(re,' ')};}else if(cur)cur.text+=' '+ln;}
- if(cur)blocks.push(cur);if(!blocks.length&&text.trim())blocks.push({num:null,text:text});return blocks;}
+function segment(text){const re=/c[aâ]u\s*(?:h[oỏ]i)?\s*(\d{1,3})/gi;const marks=[];let m;
+ while((m=re.exec(text))){marks.push({num:parseInt(m[1],10),idx:m.index,end:re.lastIndex});}
+ if(!marks.length)return text.trim()?[{num:null,text:text}]:[];
+ const blocks=[];for(let i=0;i<marks.length;i++){const start=marks[i].end;const stop=i+1<marks.length?marks[i+1].idx:text.length;blocks.push({num:marks[i].num,text:text.slice(start,stop)});}return blocks;}
 function show(fullText){
   $('#hero').hidden=true;
   const blocks=segment(fullText);const res={};let auto=0;
-  for(const b of blocks){const bn=nrm(b.text);if(bn.split(' ').length<3)continue;const r=match(bn);if(!r.q)continue;const key=b.num!=null?b.num:('?'+(++auto));res[key]={letter:r.q.c,q:r.q,conf:r.conf};}
+  for(const b of blocks){const bn=nrm(stemOnly(b.text));if(bn.split(' ').length<3)continue;const r=match(bn);if(!r.q)continue;const key=b.num!=null?b.num:('?'+(++auto));res[key]={letter:r.q.c,q:r.q,conf:r.conf};}
   const keys=Object.keys(res).sort((a,b)=>{const na=+a,nb=+b;return isNaN(na)||isNaN(nb)?(''+a).localeCompare(''+b):na-nb;});
-  if(!keys.length){$('#big').innerHTML='Chưa đọc được câu';$('#sub').textContent='Chụp gần hơn, đủ sáng, thấy rõ chữ. Bấm chụp lại.';$('#detail').innerHTML='';return;}
-  $('#big').innerHTML=keys.map(k=>`<span class="n">${k}</span><span class="a">${res[k].letter}</span>`).join('<span class="sep"> · </span>');
-  $('#sub').textContent=keys.length+' câu — kiểm ⚠️ nếu có';
-  $('#detail').innerHTML=keys.map(k=>{const r=res[k],low=r.conf<0.45;return `<div class="row ${low?'low':''}"><div class="rb">${r.letter}</div><div><div class="rmeta">Câu ${k} · NH#${r.q.n}</div><div class="rq"><b>${esc(r.q.q.slice(0,80))}${r.q.q.length>80?'…':''}</b></div>${low?'<div class="flag">⚠️ Khớp thấp — tự kiểm</div>':''}${r.q.w?'<div class="flag">⚠️ Nguồn không in đậm</div>':''}</div></div>`}).join('');
+  if(!keys.length){$('#pills').innerHTML='';$('#sub').textContent='Chưa đọc được câu — chụp gần hơn, đủ sáng, thấy rõ chữ "Câu N". Bấm chụp lại.';$('#detail').innerHTML='';return;}
+  $('#pills').innerHTML=keys.map(k=>{const r=res[k],low=r.conf<0.45;return `<span class="pill ${low?'low':''}"><span class="pn">${k}</span><span class="pa">${r.letter}</span></span>`}).join('');
+  $('#sub').textContent=keys.length+' câu'+(keys.some(k=>res[k].conf<0.45)?' — có câu ⚠️ độ khớp thấp, tự kiểm lại':'');
+  $('#detail').innerHTML=keys.map(k=>{const r=res[k],low=r.conf<0.45;return `<div class="row ${low?'low':''}"><div class="rb ${low?'low':''}">${r.letter}</div><div><div class="rmeta">Câu ${k} · NH#${r.q.n}</div><div class="rq"><b>${esc(r.q.q.slice(0,90))}${r.q.q.length>90?'…':''}</b></div>${low?'<div class="flag">⚠️ Khớp thấp — tự kiểm</div>':''}${r.q.w?'<div class="flag">⚠️ Nguồn không in đậm</div>':''}</div></div>`}).join('');
 }
 let worker=null;
 async function getWorker(){if(worker)return worker;setSt('Tải OCR (lần đầu ~vài MB)…');
@@ -84,11 +88,11 @@ async function getWorker(){if(worker)return worker;setSt('Tải OCR (lần đầ
 function setSt(t){$('#status').textContent=t;}
 function pre(file,cb){const img=new Image();img.onload=()=>{const vw=img.naturalWidth,vh=img.naturalHeight;const scale=Math.min(2,1800/vw||1);const c=document.createElement('canvas');c.width=vw*scale;c.height=vh*scale;const g=c.getContext('2d');g.drawImage(img,0,0,c.width,c.height);try{const im=g.getImageData(0,0,c.width,c.height),d=im.data;for(let i=0;i<d.length;i+=4){const y=0.3*d[i]+0.59*d[i+1]+0.11*d[i+2];const v=y>150?255:(y<95?0:y);d[i]=d[i+1]=d[i+2]=v;}g.putImageData(im,0,0);}catch(e){}c.toBlob(b=>cb(b||file,c.toDataURL('image/jpeg',.6)),'image/png');};img.onerror=()=>cb(file,'');img.src=URL.createObjectURL(file);}
 async function run(file){
-  $('#big').innerHTML='';$('#sub').textContent='';$('#detail').innerHTML='';
+  $('#pills').innerHTML='';$('#sub').textContent='';$('#detail').innerHTML='';
   $('#status').innerHTML='<div class="spin"></div>Đang xử lý ảnh…';
   pre(file,async(blob,url)=>{ if(url){$('#shot').src=url;$('#shot').style.display='';}
     try{const wk=await getWorker();const {data}=await wk.recognize(blob);$('#barwrap').hidden=true;setSt('');show(data.text);}
-    catch(e){setSt('');$('#big').innerHTML='Lỗi';$('#sub').textContent='Không tải được OCR — kiểm tra mạng rồi thử lại.';}
+    catch(e){setSt('');$('#sub').textContent='Không tải được OCR — kiểm tra mạng rồi thử lại.';}
   });
 }
 $('#snap').onclick=()=>{$('#file').setAttribute('capture','environment');$('#file').click();};
