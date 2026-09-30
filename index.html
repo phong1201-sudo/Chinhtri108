@@ -67,9 +67,18 @@ function splitQO(T){const parts=T.split(/\s([a-f])\s/);const stem=parts[0];const
 function match(bn){const toks=[...new Set(bn.split(' ').filter(t=>t.length>=2))];let best=null,bs=-1,second=-1;
  for(const q of BANK){let s=0,mW=0,tW=0;for(const t of toks){const iw=w(t);tW+=iw;if(q.qn.includes(t))mW+=iw;}if(tW>0)s=(mW/tW)*100+mW*1.2;if(q.qn.includes(bn)&&bn.length>15)s+=60;if(s>bs){second=bs;bs=s;best=q;}else if(s>second)second=s;}
  const conf=bs<=0?0:Math.min(1,(bs/(toks.length*4+40))*(second>0?Math.min(1.4,bs/(second+1)):1.2));return{q:best,conf};}
-function pickLetter(opts,ctNorm){const ct=new Set(ctNorm.split(' ').filter(t=>t.length>=2));let best=null,bs=-1,sec=-1;
- for(const o of opts){const os=new Set(nrm(o.text).split(' ').filter(t=>t.length>=2));let inter=0;for(const t of ct)if(os.has(t))inter++;const cov=ct.size?inter/ct.size:0;const extra=os.size?(os.size-inter)/os.size:0;const sc=cov*2-extra*0.4;if(sc>bs){sec=bs;bs=sc;best=o;}else if(sc>sec)sec=sc;}
- return{L:best?best.L:null,score:bs,margin:bs-sec};}
+function pickLetterVote(T,ctNorm){
+ const re=/(?:^|\s)([a-f])(?=\s)/g;let m;const marks=[];
+ while((m=re.exec(T))){marks.push({L:m[1].toUpperCase(),pos:m.index+m[0].length-1});}
+ if(marks.length<2)return{L:null,conf:0};
+ const cts=[...new Set(ctNorm.split(' ').filter(t=>t.length>=3))].sort((a,b)=>w(b)-w(a)).slice(0,8);
+ const votes={};let tot=0;
+ for(const t of cts){let idx=T.indexOf(' '+t+' ');if(idx>=0)idx+=1;else if(T.startsWith(t+' '))idx=0;else continue;
+   let opt=null;for(const mk of marks){if(mk.pos<=idx){if(!opt||mk.pos>opt.pos)opt=mk;}}
+   if(opt){votes[opt.L]=(votes[opt.L]||0)+w(t);tot+=w(t);}}
+ if(!tot)return{L:null,conf:0};
+ let bL=null,bV=0,sec=0;for(const k in votes){if(votes[k]>bV){sec=bV;bV=votes[k];bL=k;}else if(votes[k]>sec)sec=votes[k];}
+ return{L:bL,conf:bV/(bV+sec+.001)};}
 function segment(T){const re=/cau\s*(?:hoi\s*)?(\d{1,3})/g;const marks=[];let m;while((m=re.exec(T))){marks.push({num:parseInt(m[1],10),idx:m.index,end:re.lastIndex});}
  if(!marks.length)return T.trim()?[{num:null,text:T}]:[];const b=[];for(let i=0;i<marks.length;i++){const s=marks[i].end,e=i+1<marks.length?marks[i+1].idx:T.length;b.push({num:marks[i].num,text:T.slice(s,e)});}return b;}
 function show(fullText){
@@ -77,13 +86,13 @@ function show(fullText){
   const blocks=segment(nrm(fullText));const res={};let auto=0;
   for(const bl of blocks){const {stem,opts}=splitQO(bl.text);if(stem.split(' ').length<2)continue;const r=match(stem);if(!r.q)continue;
     let letter,margin=9,fromBank=false;
-    if(opts.length>=2&&r.q.ct){const pk=pickLetter(opts,nrm(r.q.ct));letter=pk.L;margin=pk.margin;}
+    if(r.q.ct){const pk=pickLetterVote(bl.text,nrm(r.q.ct));if(pk.L){letter=pk.L;margin=pk.conf;}}
     if(!letter){letter=r.q.c;fromBank=true;margin=0;}
     const key=bl.num!=null?bl.num:('?'+(++auto));
     res[key]={letter,q:r.q,conf:r.conf,margin,fromBank};}
   const keys=Object.keys(res).sort((a,b)=>{const na=+a,nb=+b;return isNaN(na)||isNaN(nb)?(''+a).localeCompare(''+b):na-nb;});
   if(!keys.length){$('#pills').innerHTML='';$('#sub').textContent='Chưa đọc được câu — chụp gần hơn, đủ sáng, thấy rõ chữ "Câu N" và các phương án. Bấm chụp lại.';$('#detail').innerHTML='';return;}
-  const isLow=r=>r.conf<0.45||r.margin<0.5||r.fromBank||r.q.w;
+  const isLow=r=>r.conf<0.45||r.margin<0.6||r.fromBank||r.q.w;
   $('#pills').innerHTML=keys.map(k=>{const r=res[k],low=isLow(r);return `<span class="pill ${low?'low':''}"><span class="pn">${k}</span><span class="pa">${r.q.w?'?':r.letter}</span></span>`}).join('');
   $('#sub').textContent=keys.length+' câu'+(keys.some(k=>isLow(res[k]))?' — ô viền vàng ⚠️ nên tự kiểm':'');
   $('#detail').innerHTML=keys.map(k=>{const r=res[k],low=isLow(r);
